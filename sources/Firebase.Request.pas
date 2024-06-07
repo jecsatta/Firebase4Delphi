@@ -16,18 +16,28 @@
   ******************************************************************************** }
 
 unit Firebase.Request;
-
+{$IFDEF FPC}
+{$mode Delphi}{$H+}
+{$ENDIF}
 interface
 
 uses
   Firebase.Interfaces,
   Firebase.Response,
+  {$IFDEF FPC}
+  fpjson,
+  SysUtils,
+  Classes,
+  fphttpclient,
+  Generics.Collections
+  {$ELSE}
   System.JSON,
   System.SysUtils,
   System.Net.URLClient,
   System.Classes,
   System.Net.HttpClient,
-  System.Generics.Collections;
+  System.Generics.Collections
+  {$ENDIF};
 
 type
 
@@ -44,8 +54,8 @@ type
     procedure SetBaseURI(const ABaseURI: string);
     procedure SetToken(const AToken: string);
     function SendData(const AResourceParams: array of string;
-      const ACommand: TFirebaseCommand; AData: TJSONValue = nil;
-      AQueryParams: TDictionary < string, string >= nil;
+      const ACommand: TFirebaseCommand; AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil;
+      AQueryParams: TDictionary < string, string > = nil;
       ADataOwner: boolean = true): IFirebaseResponse;
     property BaseURI: string read FBaseURI write SetBaseURI;
     property Token: string read FToken write SetToken;
@@ -54,7 +64,12 @@ type
 implementation
 
 uses
-  System.NetConsts, System.NetEncoding, System.StrUtils;
+  {$IFDEF FPC}
+  StrUtils
+  {$ELSE}
+  System.NetConsts, System.NetEncoding, System.StrUtils
+  {$ENDIF}
+  ;
 
 { TFirebaseRequest }
 
@@ -69,32 +84,50 @@ begin
 end;
 
 function TFirebaseRequest.SendData(const AResourceParams: array of string;
-  const ACommand: TFirebaseCommand; AData: TJSONValue = nil;
+  const ACommand: TFirebaseCommand; AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil;
   AQueryParams: TDictionary<string, string> = nil; ADataOwner: boolean = true)
   : IFirebaseResponse;
 var
-  LClient: THTTPClient;
-  LResp: IHTTPResponse;
+
+  LClient: {$IFDEF FPC} TFPHTTPClient {$ELSE}   THTTPClient  {$ENDIF};
+  LResp: {$IFDEF FPC} String {$ELSE}   IHTTPResponse  {$ENDIF};
   LURL: string;
   LSource: TStringStream;
 begin
   try
+
+    {$IFDEF FPC}
+    LClient := TFPHTTPClient.Create(nil);
+    LClient.AddHeader('Content-Type', 'application/json');
+    {$ELSE}
     LClient := THTTPClient.Create;
     LClient.ContentType := 'application/json';
+    {$ENDIF}
     try
       LSource := nil;
       if AData <> nil then
-        LSource := TStringStream.Create(AData.ToJSON);
+        LSource := TStringStream.Create({$IFDEF FPC} AData.AsJSON {$ELSE}   AData.ToJSON  {$ENDIF});
       try
         LURL := BaseURI + EncodeResourceParams(AResourceParams) +
           EncodeToken(Token) + EncodeQueryParams(AQueryParams);
         case ACommand of
           fcPut:
-            LResp := LClient.Put(LURL, LSource);
+            begin
+
+              {$IFDEF FPC}LClient.RequestBody:=LSource;{$ENDIF}
+              LResp := LClient.Put(LURL{$IFNDEF FPC} , LSource{$ENDIF});
+            end;
           fcPost:
-            LResp := LClient.Post(LURL, LSource);
+            begin
+              {$IFDEF FPC}LClient.RequestBody:=LSource;{$ENDIF}
+              LResp := LClient.Post(LURL {$IFNDEF FPC} , LSource{$ENDIF});
+            end;
+          {$IFNDEF FPC}
           fcPatch:
+            begin
             LResp := LClient.Patch(LURL, LSource);
+            end;
+          {$ENDIF}
           fcGet:
             LResp := LClient.Get(LURL);
           fcRemove:
@@ -136,8 +169,9 @@ begin
   begin
     if Result <> '?' then
       Result := Result + '&';
-    Result := Result + TNetEncoding.URL.Encode(Param.Key) + '=' +
-      TNetEncoding.URL.Encode(Param.Value)
+    ;
+    Result := Result + {$IFDEF FPC} EncodeURLElement{$ELSE}   TNetEncoding.URL.Encode  {$ENDIF}(Param.Key) + '=' +
+      {$IFDEF FPC} EncodeURLElement{$ELSE}   TNetEncoding.URL.Encode  {$ENDIF}(Param.Value)
   end;
 end;
 
@@ -148,7 +182,7 @@ var
 begin
   Result := '';
   for i := low(AResourceParams) to high(AResourceParams) do
-    Result := Result + '/' + TNetEncoding.URL.Encode(AResourceParams[i]);
+    Result := Result + '/' + {$IFDEF FPC} EncodeURLElement{$ELSE}   TNetEncoding.URL.Encode  {$ENDIF}(AResourceParams[i]);
 end;
 
 function TFirebaseRequest.EncodeToken(const AToken: string): string;
@@ -156,7 +190,7 @@ begin
   if Token.IsEmpty then
     Result := ''
   else
-    Result := '?auth=' + TNetEncoding.URL.Encode(Token);
+    Result := '?auth=' + {$IFDEF FPC} EncodeURLElement{$ELSE}   TNetEncoding.URL.Encode  {$ENDIF}(Token);
 end;
 
 end.

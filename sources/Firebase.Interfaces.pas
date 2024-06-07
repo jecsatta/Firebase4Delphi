@@ -15,14 +15,22 @@
   ******************************************************************************** }
 
 unit Firebase.Interfaces;
-
+{$IFDEF FPC}
+{$mode Delphi}{$H+}
+{$ENDIF}
 interface
 
 uses
+  {$IFDEF FPC}
+   fpjson,
+   SysUtils,
+   Generics.Collections
+  {$ELSE}
   System.JSON,
   System.SysUtils,
-  System.Generics.Collections;
-
+  System.Generics.Collections
+  {$ENDIF}
+  ;
 type
 
   TFirebaseCommand = (fcPut, fcPatch, fcPost, fcGet, fcRemove);
@@ -36,10 +44,12 @@ type
     ['{3B265C49-747A-4EFF-AC76-138A39F1C34B}']
     procedure SetBaseURI(const ABaseURI: string);
     procedure SetToken(const AToken: string);
+
     function SendData(const AResourceParams: array of string;
-      const ACommand: TFirebaseCommand; AData: TJSONValue = nil;
-      AQueryParams: TDictionary < string, string >= nil;
+      const ACommand: TFirebaseCommand; AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil;
+      AQueryParams: TDictionary < string, string > = nil;
       ADataOwner: boolean = true): IFirebaseResponse;
+
   end;
 
   IFirebaseDatabase = interface(IInterface)
@@ -48,13 +58,14 @@ type
     procedure SetToken(const AToken: string);
     function Get(const AParams: array of string;
       AQueryParams: TDictionary<string, string> = nil): IFirebaseResponse;
-    function Put(const AParams: array of string; AData: TJSONValue = nil;
+
+    function Put(const AParams: array of string; AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil;
       AQueryParams: TDictionary<string, string> = nil;
       ADataOwner: boolean = true): IFirebaseResponse;
-    function Post(const AParams: array of string; AData: TJSONValue = nil;
+    function Post(const AParams: array of string; AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil;
       AQueryParams: TDictionary<string, string> = nil;
       ADataOwner: boolean = true): IFirebaseResponse;
-    function Patch(const AParams: array of string; AData: TJSONValue = nil;
+    function Patch(const AParams: array of string; AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil;
       AQueryParams: TDictionary<string, string> = nil;
       ADataOwner: boolean = true): IFirebaseResponse;
     function Delete(const AParams: array of string;

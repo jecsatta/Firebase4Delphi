@@ -15,19 +15,30 @@
   ******************************************************************************** }
 
 unit Firebase.Database;
-
+{$IFDEF FPC}
+{$mode Delphi}{$H+}
+{$ENDIF}
 interface
 
 uses
+
   Firebase.Interfaces,
   Firebase.Response,
   Firebase.Request,
+  {$IFDEF FPC}
+  fphttpclient,
+  fpjson,
+  Generics.Collections,
+  SysUtils
+  {$ELSE}
   System.Net.HttpClient,
   System.Net.URLClient,
   System.Classes,
   System.JSON,
   System.SysUtils,
-  System.Generics.Collections;
+  System.Generics.Collections
+  {$ENDIF}
+  ;
 
 type
 
@@ -40,13 +51,13 @@ type
     procedure SetToken(const AToken: string);
     function Get(const AParams: array of string;
       AQueryParams: TDictionary<string, string> = nil): IFirebaseResponse;
-    function Put(const AParams: array of string; AData: TJSONValue = nil;
+    function Put(const AParams: array of string; AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil;
       AQueryParams: TDictionary<string, string> = nil;
       ADataOwner: boolean = true): IFirebaseResponse;
-    function Post(const AParams: array of string; AData: TJSONValue = nil;
+    function Post(const AParams: array of string; AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil;
       AQueryParams: TDictionary<string, string> = nil;
       ADataOwner: boolean = true): IFirebaseResponse;
-    function Patch(const AParams: array of string; AData: TJSONValue = nil;
+    function Patch(const AParams: array of string; AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil;
       AQueryParams: TDictionary<string, string> = nil;
       ADataOwner: boolean = true): IFirebaseResponse;
     function Delete(const AParams: array of string;
@@ -80,7 +91,7 @@ begin
 end;
 
 function TFirebaseDatabase.Post(const AParams: array of string;
-  AData: TJSONValue = nil; AQueryParams: TDictionary<string, string> = nil;
+  AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil; AQueryParams: TDictionary<string, string> = nil;
   ADataOwner: boolean = true): IFirebaseResponse;
 var
   ARequest: IFirebaseRequest;
@@ -91,7 +102,7 @@ begin
 end;
 
 function TFirebaseDatabase.Put(const AParams: array of string;
-  AData: TJSONValue = nil; AQueryParams: TDictionary<string, string> = nil;
+  AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil; AQueryParams: TDictionary<string, string> = nil;
   ADataOwner: boolean = true): IFirebaseResponse;
 var
   ARequest: IFirebaseRequest;
@@ -102,7 +113,7 @@ begin
 end;
 
 function TFirebaseDatabase.Patch(const AParams: array of string;
-  AData: TJSONValue = nil; AQueryParams: TDictionary<string, string> = nil;
+  AData: {$IFDEF FPC} TJSONData {$ELSE}   TJSONValue  {$ENDIF} = nil; AQueryParams: TDictionary<string, string> = nil;
   ADataOwner: boolean = true): IFirebaseResponse;
 var
   ARequest: IFirebaseRequest;

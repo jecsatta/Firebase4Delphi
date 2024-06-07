@@ -16,19 +16,30 @@
   ********************************************************************************}
 
 unit Firebase.Auth;
-
+{$IFDEF FPC}
+{$mode Delphi}{$H+}
+{$ENDIF}
 interface
 
 uses
   Firebase.Interfaces,
   Firebase.Response,
   Firebase.Request,
+  {$IFDEF FPC}
+  fpjson,
+  SysUtils,
+  Classes,
+  Generics.Collections
+  {$ELSE}
   System.Net.HttpClient,
   System.Net.URLClient,
   System.Classes,
   System.JSON,
   System.SysUtils,
-  System.Generics.Collections;
+  System.Generics.Collections
+  {$ENDIF}
+  ;
+
 
 const
   GOOGLE_REFRESH_AUTH_URL = 'https://securetoken.googleapis.com/v1/token';
@@ -70,10 +81,15 @@ var
 begin
 
   AData := TJSONObject.Create;
+  {$IFDEF FPC}
+  AData.Add('email',AEmail);
+  AData.Add('password',APassword);
+  AData.Add('returnSecureToken','true');
+  {$ELSE}
   AData.AddPair(TJSONPair.Create('email',AEmail));
   AData.AddPair(TJSONPair.Create('password',APassword));
   AData.AddPair(TJSONPair.Create('returnSecureToken','true'));
-
+  {$ENDIF}
   ARequest := TFirebaseRequest.Create;
   ARequest.SetBaseURI(GOOGLE_PASSWORD_URL);
   AParams := TDictionary<string, string>.Create;

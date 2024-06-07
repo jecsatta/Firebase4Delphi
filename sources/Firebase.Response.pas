@@ -16,20 +16,32 @@
 
 unit Firebase.Response;
 
+{$IFDEF FPC}
+{$mode Delphi}{$H+}
+{$ENDIF}
+
 interface
 
 uses
   Firebase.Interfaces,
-  System.SysUtils,
-  System.Net.HttpClient;
+  {$IFDEF FPC}
+  SysUtils,
+  fphttpclient
+  {$ELSE}
+    System.SysUtils,
+    System.Net.HttpClient
+  {$ENDIF}
+  ;
 
 type
 
   TFirebaseResponse = class(TInterfacedObject, IFirebaseResponse)
   private
-    FHttpResponse: IHTTPResponse;
+
+    FHttpResponse: {$IFDEF FPC} String {$ELSE}   IHTTPResponse  {$ENDIF};
+
   public
-    constructor Create(AHTTPResponse: IHTTPResponse);
+    constructor Create(AHTTPResponse: {$IFDEF FPC} String {$ELSE}   IHTTPResponse  {$ENDIF});
     function ContentAsString(const AEncoding: TEncoding = nil): string;
   end;
 
@@ -40,10 +52,10 @@ implementation
 function TFirebaseResponse.ContentAsString(const AEncoding
   : TEncoding = nil): string;
 begin
-  Result := FHttpResponse.ContentAsString(AEncoding);
+  Result := {$IFDEF FPC}FHttpResponse{$ELSE} FHttpResponse.ContentAsString(AEncoding){$ENDIF};;
 end;
 
-constructor TFirebaseResponse.Create(AHTTPResponse: IHTTPResponse);
+constructor TFirebaseResponse.Create(AHTTPResponse: {$IFDEF FPC} String {$ELSE}   IHTTPResponse  {$ENDIF});
 begin
   inherited Create;
   FHttpResponse := AHTTPResponse;
