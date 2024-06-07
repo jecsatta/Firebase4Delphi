@@ -1,0 +1,151 @@
+object Form1: TForm1
+  Left = 0
+  Height = 510
+  Top = 0
+  Width = 695
+  Caption = 'Firebase Authentication Demo'
+  ClientHeight = 510
+  ClientWidth = 695
+  object Label1: TLabel
+    Left = 9
+    Height = 15
+    Top = 7
+    Width = 29
+    Caption = 'Email'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 9
+    Height = 15
+    Top = 47
+    Width = 50
+    Caption = 'Password'
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 9
+    Height = 15
+    Top = 219
+    Width = 31
+    Caption = 'Token'
+    ParentColor = False
+  end
+  object Label4: TLabel
+    Left = 8
+    Height = 15
+    Top = 349
+    Width = 50
+    Caption = 'Response'
+    ParentColor = False
+  end
+  object Label5: TLabel
+    Left = 8
+    Height = 15
+    Top = 87
+    Width = 29
+    Caption = 'Node'
+    ParentColor = False
+  end
+  object Label6: TLabel
+    Left = 8
+    Height = 15
+    Top = 131
+    Width = 65
+    Caption = 'Firebase Key'
+    ParentColor = False
+  end
+  object Label7: TLabel
+    Left = 8
+    Height = 15
+    Top = 173
+    Width = 88
+    Caption = 'Firebase Domain'
+    ParentColor = False
+  end
+  object edtEmail: TEdit
+    Left = 9
+    Height = 23
+    Top = 23
+    Width = 289
+    TabOrder = 1
+    Text = 'test@test.com'
+  end
+  object edtPassword: TEdit
+    Left = 9
+    Height = 23
+    Top = 63
+    Width = 289
+    EchoMode = emPassword
+    PasswordChar = '*'
+    TabOrder = 3
+    Text = '030372'
+  end
+  object memoToken: TMemo
+    Left = 9
+    Height = 111
+    Top = 235
+    Width = 454
+    TabOrder = 8
+  end
+  object Button1: TButton
+    Left = 320
+    Height = 25
+    Top = 21
+    Width = 143
+    Caption = 'SignIn'
+    OnClick = Button1Click
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 320
+    Height = 25
+    Top = 61
+    Width = 143
+    Caption = 'Get'
+    OnClick = Button2Click
+    TabOrder = 2
+  end
+  object memoResp: TMemo
+    Left = 8
+    Height = 132
+    Top = 365
+    Width = 454
+    Lines.Strings = (
+      ''
+    )
+    TabOrder = 9
+  end
+  object edtNode: TEdit
+    Left = 8
+    Height = 23
+    Top = 103
+    Width = 289
+    TabOrder = 5
+    Text = '/queue/output'
+  end
+  object edtKey: TEdit
+    Left = 8
+    Height = 23
+    Top = 147
+    Width = 289
+    TabOrder = 6
+    Text = 'AIzaSyBPQVbvy123213218xr57EraW9pNQ'
+  end
+  object Button3: TButton
+    Left = 320
+    Height = 25
+    Top = 101
+    Width = 143
+    Caption = 'Post'
+    OnClick = Button3Click
+    TabOrder = 4
+  end
+  object edtDomain: TEdit
+    Left = 8
+    Height = 23
+    Top = 189
+    Width = 289
+    TabOrder = 7
+    Text = 'https://cloudclass-156620.firebaseio.com'
+  end
+end
